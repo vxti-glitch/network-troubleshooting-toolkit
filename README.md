@@ -1,8 +1,16 @@
 # Network Troubleshooting Toolkit
 
+[![Python tests](https://github.com/vxti-glitch/network-troubleshooting-toolkit/actions/workflows/python-tests.yml/badge.svg)](https://github.com/vxti-glitch/network-troubleshooting-toolkit/actions/workflows/python-tests.yml)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20Linux-2E8B57)
+
 A help desk focused network triage CLI that runs repeatable DNS, ping, TCP port, and local network checks, then writes escalation-ready Markdown and JSON reports.
 
 This project is built for entry-level IT interviews: it shows practical troubleshooting flow, clean report writing, testable code, and safe defaults.
+
+![Sample network triage run](docs/assets/terminal-demo-final.png)
+
+_Sample run against the included target configuration._
 
 ## What it demonstrates
 
@@ -14,6 +22,19 @@ This project is built for entry-level IT interviews: it shows practical troubles
 - Markdown and JSON report exports
 - Unit-tested diagnostic logic
 - GitHub Actions CI
+
+## Workflow
+
+```mermaid
+flowchart LR
+    A[Target configuration] --> B[DNS checks]
+    A --> C[Ping checks]
+    A --> D[TCP checks]
+    B --> E[Status summary]
+    C --> E
+    D --> E
+    E --> F[Ticket-ready report]
+```
 
 ## Quick start
 
@@ -27,6 +48,8 @@ Generated files:
 
 - `reports/network-triage.json`
 - `reports/network-triage.md`
+
+See the checked-in [example triage report](docs/examples/network-triage.md) and [example JSON evidence](docs/examples/network-triage.json).
 
 ## Sample target config
 

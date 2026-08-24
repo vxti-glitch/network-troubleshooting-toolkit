@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "target_count": 3,
+    "check_count": 4,
+    "status": "healthy",
+    "failed_checks": 0
+  },
+  "targets": [
+    {
+      "name": "Localhost",
+      "host": "localhost",
+      "dns": true,
+      "ping": true,
+      "ports": []
+    },
+    {
+      "name": "Microsoft Login",
+      "host": "login.microsoftonline.com",
+      "dns": true,
+      "ping": false,
+      "ports": [
+        443
+      ]
+    },
+    {
+      "name": "Cloudflare DNS",
+      "host": "1.1.1.1",
+      "dns": false,
+      "ping": true,
+      "ports": [
+        53
+      ]
+    }
+  ],
+  "results": [
+    {
+      "name": "Localhost",
+      "target": "localhost",
+      "check": "dns",
+      "status": "pass",
+      "detail": "127.0.0.1, ::1",
+      "latency_ms": 6.04
+    },
+    {
+      "name": "Microsoft Login",
+      "target": "login.microsoftonline.com",
+      "check": "dns",
+      "status": "pass",
+      "detail": "20.190.157.13, 20.190.157.15, 20.190.157.4, 40.126.29.11, 40.126.29.14",
+      "latency_ms": 57.58
+    },
+    {
+      "name": "Microsoft Login",
+      "target": "login.microsoftonline.com",
+      "check": "tcp/443",
+      "status": "pass",
+      "detail": "TCP port 443 accepted a connection.",
+      "latency_ms": 52.92
+    },
+    {
+      "name": "Cloudflare DNS",
+      "target": "1.1.1.1",
+      "check": "tcp/53",
+      "status": "pass",
+      "detail": "TCP port 53 accepted a connection.",
+      "latency_ms": 4.4
+    }
+  ],
+  "local_info": null
+}

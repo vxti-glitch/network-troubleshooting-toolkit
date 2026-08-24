@@ -7,3 +7,6 @@ venv/
 env/
 reports/
 *.log
+docs/assets/terminal-preview*.png
+docs/assets/terminal-demo.png
+docs/assets/terminal-demo-render.png

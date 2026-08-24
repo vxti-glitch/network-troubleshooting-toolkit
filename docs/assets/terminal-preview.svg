@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="300" viewBox="0 0 1120 300" role="img" aria-labelledby="title desc">
+  <title id="title">Sample network troubleshooting run</title>
+  <desc id="desc">PowerShell command running four DNS and TCP checks against three configured targets.</desc>
+  <rect width="1120" height="300" rx="8" fill="#111827"/>
+  <rect width="1120" height="44" rx="8" fill="#1f2937"/>
+  <rect y="36" width="1120" height="8" fill="#1f2937"/>
+  <circle cx="24" cy="22" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="22" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="22" r="6" fill="#22c55e"/>
+  <text x="88" y="28" fill="#d1d5db" font-family="Consolas, monospace" font-size="16">PowerShell - Network triage</text>
+  <g fill="#e5e7eb" font-family="Consolas, monospace" font-size="17">
+    <text x="24" y="82"><tspan fill="#60a5fa">PS&gt;</tspan> python .\src\net_triage.py --config .\samples\targets.json</text>
+    <text x="58" y="112">--out .\reports --timeout 2 --skip-ping</text>
+    <text x="24" y="164">Ran <tspan fill="#fbbf24">4 checks</tspan> against <tspan fill="#fbbf24">3 targets</tspan>.</text>
+    <text x="24" y="200">Overall status: <tspan fill="#22c55e">healthy</tspan></text>
+    <text x="24" y="238">Output written to .\reports</text>
+    <text x="24" y="274" fill="#9ca3af">Evidence: network-triage.json | network-triage.md</text>
+  </g>
+</svg>
