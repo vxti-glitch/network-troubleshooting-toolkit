@@ -1,0 +1,25 @@
+{
+  "targets": [
+    {
+      "name": "Localhost",
+      "host": "localhost",
+      "dns": true,
+      "ping": true,
+      "ports": []
+    },
+    {
+      "name": "Microsoft Login",
+      "host": "login.microsoftonline.com",
+      "dns": true,
+      "ping": false,
+      "ports": [443]
+    },
+    {
+      "name": "Cloudflare DNS",
+      "host": "1.1.1.1",
+      "dns": false,
+      "ping": true,
+      "ports": [53]
+    }
+  ]
+}
