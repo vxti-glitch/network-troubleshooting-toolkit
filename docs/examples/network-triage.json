@@ -36,18 +36,30 @@
     {
       "name": "Localhost",
       "target": "localhost",
-      "check": "dns",
+      "check": "dns/system",
       "status": "pass",
       "detail": "127.0.0.1, ::1",
-      "latency_ms": 6.04
+      "command_elapsed_ms": 6.04,
+      "packet_loss_percent": null,
+      "rtt_min_ms": null,
+      "rtt_avg_ms": null,
+      "rtt_max_ms": null,
+      "evidence_state": "observed",
+      "limitation": "Uses the operating system resolver path; this is not a direct query to a named DNS server."
     },
     {
       "name": "Microsoft Login",
       "target": "login.microsoftonline.com",
-      "check": "dns",
+      "check": "dns/system",
       "status": "pass",
       "detail": "20.190.157.13, 20.190.157.15, 20.190.157.4, 40.126.29.11, 40.126.29.14",
-      "latency_ms": 57.58
+      "command_elapsed_ms": 57.58,
+      "packet_loss_percent": null,
+      "rtt_min_ms": null,
+      "rtt_avg_ms": null,
+      "rtt_max_ms": null,
+      "evidence_state": "observed",
+      "limitation": "Uses the operating system resolver path; this is not a direct query to a named DNS server."
     },
     {
       "name": "Microsoft Login",
@@ -55,7 +67,13 @@
       "check": "tcp/443",
       "status": "pass",
       "detail": "TCP port 443 accepted a connection.",
-      "latency_ms": 52.92
+      "command_elapsed_ms": 52.92,
+      "packet_loss_percent": null,
+      "rtt_min_ms": null,
+      "rtt_avg_ms": null,
+      "rtt_max_ms": null,
+      "evidence_state": "observed",
+      "limitation": "Command elapsed time includes local runtime overhead and is not application response time."
     },
     {
       "name": "Cloudflare DNS",
@@ -63,7 +81,13 @@
       "check": "tcp/53",
       "status": "pass",
       "detail": "TCP port 53 accepted a connection.",
-      "latency_ms": 4.4
+      "command_elapsed_ms": 4.4,
+      "packet_loss_percent": null,
+      "rtt_min_ms": null,
+      "rtt_avg_ms": null,
+      "rtt_max_ms": null,
+      "evidence_state": "observed",
+      "limitation": "TCP reachability does not prove DNS service health or UDP/53 availability."
     }
   ],
   "local_info": null

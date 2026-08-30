@@ -4,7 +4,7 @@
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20Linux-2E8B57)
 
-A help desk focused network triage CLI that runs repeatable DNS, ping, TCP port, and local network checks, then writes escalation-ready Markdown and JSON reports.
+A help desk focused network triage CLI that records the system DNS path, ICMP evidence, TCP port reachability, and local network state, then writes escalation-ready Markdown and JSON reports without overstating what any single check proves.
 
 This project is built for entry-level IT interviews: it shows practical troubleshooting flow, clean report writing, testable code, and safe defaults.
 
@@ -14,10 +14,10 @@ This project is built for entry-level IT interviews: it shows practical troubles
 
 The browser demo gives recruiters and hiring managers a quick, installation-free way to review the troubleshooting workflow:
 
-- Choose realistic synthetic incidents covering healthy SaaS access, VPN/DNS failure, blocked HTTPS, and local adapter failure
+- Choose twelve realistic synthetic incidents covering healthy SaaS access, VPN/DNS and route failures, blocked ports, APIPA/DHCP, wrong gateway, loss/latency, Wi-Fi roaming, duplicate IP symptoms, adapter faults, and proxy/captive-portal behavior
 - Follow the service path from the endpoint through gateway, DNS, and application port
 - Review the technician assessment and recommended next action
-- Review synthetic latency history, per-run timestamps, endpoint context, and alert acknowledgement state
+- Review packet-loss/RTT evidence separately from command elapsed time, per-run timestamps, endpoint context, and alert acknowledgement state
 - Generate a ticket-ready note plus downloadable Markdown, JSON, and adapter evidence
 - Compare the browser logic with the tested Python implementation in this repository
 
@@ -29,10 +29,11 @@ _Sample run against the included target configuration._
 
 ## What it demonstrates
 
-- DNS resolution checks
+- System DNS-path observations with explicit evidence limitations
 - TCP port reachability checks
-- Ping availability checks
-- Local adapter/IP configuration capture
+- Parsed ICMP packet-loss and RTT evidence; ICMP failure alone is not treated as application failure
+- Local adapter/IP configuration capture with APIPA, gateway, DNS, DHCP, and route interpretation
+- Twelve hypothesis-driven troubleshooting scenarios and an interactive field guide
 - JSON-driven target configuration
 - Markdown and JSON report exports
 - Unit-tested diagnostic logic

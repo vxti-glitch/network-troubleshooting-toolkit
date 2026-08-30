@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import re
 import socket
 import subprocess
 import time
@@ -36,7 +37,13 @@ class CheckResult:
     check: str
     status: str
     detail: str
-    latency_ms: float | None = None
+    command_elapsed_ms: float | None = None
+    packet_loss_percent: float | None = None
+    rtt_min_ms: float | None = None
+    rtt_avg_ms: float | None = None
+    rtt_max_ms: float | None = None
+    evidence_state: str = "observed"
+    limitation: str = ""
 
 
 def load_targets(config_path: Path) -> list[Target]:
@@ -89,13 +96,13 @@ def dns_check(
     try:
         answers = resolver(target.host, None)
     except socket.gaierror as exc:
-        return CheckResult(target.name, target.host, "dns", "fail", f"DNS lookup failed: {exc}")
+        return CheckResult(target.name, target.host, "dns/system", "fail", f"System resolver path failed: {exc}", limitation="This does not identify which DNS server failed or prove split-DNS root cause.")
 
-    latency_ms = (time.perf_counter() - start) * 1000
+    elapsed_ms = (time.perf_counter() - start) * 1000
     addresses = sorted({answer[4][0] for answer in answers if answer and answer[4]})
     detail = ", ".join(addresses[:5]) if addresses else "No addresses returned."
     status = "pass" if addresses else "fail"
-    return CheckResult(target.name, target.host, "dns", status, detail, round(latency_ms, 2))
+    return CheckResult(target.name, target.host, "dns/system", status, f"System resolver path returned: {detail}", round(elapsed_ms, 2), limitation="Uses the operating system resolution path and cache; it does not identify the responding resolver.")
 
 
 def tcp_check(
@@ -113,14 +120,15 @@ def tcp_check(
     except OSError as exc:
         return CheckResult(target.name, target.host, f"tcp/{port}", "fail", f"Connection failed: {exc}")
 
-    latency_ms = (time.perf_counter() - start) * 1000
+    elapsed_ms = (time.perf_counter() - start) * 1000
     return CheckResult(
         target.name,
         target.host,
         f"tcp/{port}",
         "pass",
         f"TCP port {port} accepted a connection.",
-        round(latency_ms, 2),
+        round(elapsed_ms, 2),
+        limitation="Proves only that this target and TCP port accepted a connection at the test time; it does not prove application or TLS health.",
     )
 
 
@@ -140,18 +148,47 @@ def ping_check(
     except (OSError, subprocess.TimeoutExpired) as exc:
         return CheckResult(target.name, target.host, "ping", "fail", f"Ping command failed: {exc}")
 
-    latency_ms = (time.perf_counter() - start) * 1000
+    elapsed_ms = (time.perf_counter() - start) * 1000
     output = (result.stdout or result.stderr).strip().splitlines()
     detail = output[-1].strip() if output else "No ping output returned."
     status = "pass" if result.returncode == 0 else "fail"
-    return CheckResult(target.name, target.host, "ping", status, detail, round(latency_ms, 2))
+    text = "\n".join(output)
+    loss_match = re.search(r"\((\d+(?:\.\d+)?)%\s*loss\)", text, re.IGNORECASE)
+    if not loss_match:
+        loss_match = re.search(r"(\d+(?:\.\d+)?)%\s*packet loss", text, re.IGNORECASE)
+    rtt_match = re.search(r"Minimum = (\d+)ms, Maximum = (\d+)ms, Average = (\d+)ms", text, re.IGNORECASE)
+    if not rtt_match:
+        rtt_match = re.search(r"=\s*([\d.]+)/([\d.]+)/([\d.]+)/", text)
+    loss = float(loss_match.group(1)) if loss_match else None
+    rtt_min = float(rtt_match.group(1)) if rtt_match else None
+    rtt_max = float(rtt_match.group(2)) if rtt_match else None
+    rtt_avg = float(rtt_match.group(3)) if rtt_match else None
+    return CheckResult(
+        target.name, target.host, "icmp/echo", status, detail, round(elapsed_ms, 2),
+        loss, rtt_min, rtt_avg, rtt_max,
+        limitation="ICMP can be filtered or deprioritized; failure alone does not prove the application path is down.",
+    )
+
+
+def _parse_local_facts(output: str) -> dict[str, Any]:
+    ipv4 = re.findall(r"(?:IPv4 Address[^:]*|inet)\s*[: ]\s*(\d+\.\d+\.\d+\.\d+)", output, re.IGNORECASE)
+    gateways = re.findall(r"Default Gateway[^:]*:\s*(\d+\.\d+\.\d+\.\d+)", output, re.IGNORECASE)
+    dns = re.findall(r"DNS Servers[^:]*:\s*(\d+\.\d+\.\d+\.\d+)", output, re.IGNORECASE)
+    apipa = any(address.startswith("169.254.") for address in ipv4)
+    return {
+        "ipv4_addresses": ipv4,
+        "default_gateways": gateways,
+        "dns_servers": dns,
+        "apipa_detected": apipa,
+        "interpretation": "IPv4 link-local/APIPA detected; expected DHCP configuration was not observed." if apipa else "No IPv4 link-local/APIPA address detected in parsed output.",
+    }
 
 
 def collect_local_info(
     *,
     timeout: float,
     runner: Callable[[list[str], float], CommandResult] = run_command,
-) -> dict[str, str]:
+) -> dict[str, Any]:
     if platform.system().lower() == "windows":
         command = ["ipconfig", "/all"]
     else:
@@ -165,6 +202,7 @@ def collect_local_info(
         "status": "pass" if result.returncode == 0 else "fail",
         "command": " ".join(command),
         "output": output,
+        "facts": _parse_local_facts(output),
     }
 
 
@@ -195,7 +233,8 @@ def summarize_status(results: Iterable[CheckResult]) -> str:
     failures = [result for result in result_list if result.status == "fail"]
     if not failures:
         return "healthy"
-    if len(failures) == len(result_list):
+    non_icmp_failures = [result for result in failures if result.check != "icmp/echo"]
+    if len(failures) == len(result_list) and non_icmp_failures:
         return "down"
     return "degraded"
 
@@ -232,15 +271,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Check Results",
         "",
-        "| Target | Host | Check | Status | Latency ms | Detail |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Target | Host | Check | Status | Command elapsed ms | Loss % | RTT avg ms | Detail |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
 
     for result in payload["results"]:
-        latency = "" if result["latency_ms"] is None else result["latency_ms"]
+        elapsed = "" if result["command_elapsed_ms"] is None else result["command_elapsed_ms"]
+        loss = "" if result["packet_loss_percent"] is None else result["packet_loss_percent"]
+        rtt = "" if result["rtt_avg_ms"] is None else result["rtt_avg_ms"]
         lines.append(
             f"| {result['name']} | {result['target']} | {result['check']} | "
-            f"{result['status']} | {latency} | {result['detail']} |"
+            f"{result['status']} | {elapsed} | {loss} | {rtt} | {result['detail']} |"
         )
 
     local_info = payload.get("local_info")
@@ -269,6 +310,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "- DNS failures usually point to resolver, VPN, or split-horizon DNS issues.",
             "- TCP failures with successful DNS can point to firewall, proxy, routing, or service outages.",
             "- Ping failures alone are not always meaningful because many services block ICMP.",
+            "- System resolver results do not identify a DNS server unless that resolver is queried explicitly.",
+            "- Command elapsed time is not the same measurement as ICMP round-trip time.",
             "- Attach this report to the ticket with user location, device name, and timestamp.",
             "",
         ]

@@ -47,6 +47,14 @@
             <option value="dns">VPN name resolution failure</option>
             <option value="blocked">HTTPS path blocked</option>
             <option value="local">Local adapter lost its address</option>
+            <option value="gateway">Incorrect default gateway</option>
+            <option value="loss">Intermittent packet loss and latency</option>
+            <option value="firewall">Local firewall blocks one port</option>
+            <option value="duplicate">Duplicate IPv4 address symptoms</option>
+            <option value="wifi">Weak Wi-Fi signal and roaming</option>
+            <option value="route">VPN route missing for internal subnet</option>
+            <option value="adapter">Adapter disabled or driver faulted</option>
+            <option value="proxy">Proxy or captive portal interrupts access</option>
           </select>
           <p id="scenario-impact">One remote user reported that Microsoft 365 sign-in was unavailable.</p>
         </div>
@@ -133,6 +141,21 @@
         <span class="method-chip">DNS ≠ ICMP ≠ TCP</span>
       </section>
 
+      <section class="field-guide" aria-labelledby="field-guide-title">
+        <div class="tour-heading"><span class="eyebrow">Field guide</span><h2 id="field-guide-title">Network Triage Method: Scope, Layer, Test, Interpret, Verify</h2><p>Start with the user’s task and blast radius. Move through the dependency path only as far as the evidence requires, then repeat the original task after the safest approved correction.</p></div>
+        <div class="dependency-path" aria-label="Endpoint to service dependency path">
+          <span>Adapter / link</span><b>→</b><span>Address / DHCP</span><b>→</b><span>Gateway / route</span><b>→</b><span>DNS</span><b>→</b><span>TCP / TLS</span><b>→</b><span>Application</span>
+        </div>
+        <div class="guide-grid">
+          <article><span>01 · Scope</span><h3>No Network, No Internet, or One Service?</h3><p>If the adapter is down, stop above Layer 1/2. If addressing has no expected gateway, test DHCP/local configuration. If IP works but a name fails, compare system and explicit resolver results. If DNS works but the required port fails, investigate route, firewall, proxy, or service ownership. If lower layers work, move to TLS, identity, or application evidence.</p></article>
+          <article><span>02 · IPv4 evidence</span><h3>Reading Address, Gateway, DNS, and DHCP</h3><p><code>169.254.0.0/16</code> is IPv4 link-local, not a normal routed lease. A private address is not automatically valid: verify prefix, expected gateway, DNS servers, DHCP/origin, active adapter, and default route. Use documentation ranges in published examples.</p></article>
+          <article><span>03 · Commands</span><h3>Windows Network Diagnostic Command Reference</h3><p><code>ipconfig /all</code> records adapter/DHCP/DNS state. <code>Resolve-DnsName -Server</code> performs an explicit resolver query. <code>Test-NetConnection -Port</code> tests TCP reachability. <code>tracert</code> shows a TTL-derived path; <code>pathping</code> samples loss. <code>arp -a</code> and <code>Get-NetRoute</code> expose local neighbor and route state.</p></article>
+          <article><span>04 · Limits</span><h3>Interpret the Result, Not the Command Name</h3><p>A failed ping may be filtered. A silent traceroute hop is not automatically the fault. TCP success proves only that a host/port accepted a connection at that moment. System DNS may use cache and does not identify a responder. Command elapsed time is not ICMP RTT.</p></article>
+          <article><span>05 · Packet capture</span><h3>When Packet Capture Is Justified</h3><p>Use Wireshark only with authorization when safer checks cannot distinguish DNS reply behavior, TCP handshake/reset/retransmission, or DHCP exchange. Minimize duration and interface, apply narrow filters, protect payloads, and remember encrypted traffic limits content visibility.</p></article>
+          <article><span>06 · Handoff</span><h3>Network Evidence Redaction Checklist</h3><p>Before export, remove or replace user/device names, internal domains, SSIDs/BSSIDs, public IPs, tokens, VPN identifiers, unrelated neighbors, and packet payloads. Preserve timestamp, scope, command, target class, observed result, limitation, and next owner.</p></article>
+        </div>
+      </section>
+
       <section class="reviewer-tour">
         <div class="tour-heading"><span class="eyebrow">90-second reviewer tour</span><h2>What this demonstration proves</h2><p>A recruiter can understand the workflow without installing Python. An interviewer can open the repository to verify the matching implementation and tests.</p></div>
         <ol>
@@ -141,7 +164,7 @@
           <li><span>03</span><div><strong>Explain the conclusion</strong><p>Turn technical results into a plain-language assessment and a safe next action.</p></div></li>
           <li><span>04</span><div><strong>Leave usable evidence</strong><p>Generate a ticket note plus Markdown and JSON reports for the next support tier.</p></div></li>
         </ol>
-        <div class="portfolio-disclosure"><strong>Portfolio disclosure</strong><p>This is a simulated browser demonstration of hands-on project work, not paid employment or a production network scan. All hosts, addresses, users, and outcomes shown in the scenarios are fictional or documentation-safe examples.</p><a href="https://github.com/vxti-glitch/network-troubleshooting-toolkit">Inspect the Python implementation and tests <span aria-hidden="true">↗</span></a></div>
+        <div class="portfolio-disclosure"><strong>Portfolio disclosure</strong><p>This is a simulated browser demonstration of hands-on project work, not paid employment or a production network scan. All hosts, addresses, users, and outcomes shown in the scenarios are fictional or documentation-safe examples. The default collector is read-only; conclusions distinguish observed, inferred, not tested, and escalation-required evidence.</p><a href="https://github.com/vxti-glitch/network-troubleshooting-toolkit">Inspect the Python implementation and tests <span aria-hidden="true">↗</span></a></div>
       </section>
     </main>
 

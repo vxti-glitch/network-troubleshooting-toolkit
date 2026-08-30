@@ -34,7 +34,9 @@ function render() {
   assessmentState.className = `assessment-state assessment-${summary.status}`;
   assessmentState.querySelector("strong").textContent = summary.status === "healthy" ? "Service path is healthy" : summary.status === "down" ? "Service path is unavailable" : "Failure isolated for escalation";
   assessmentState.querySelector(".assessment-icon").textContent = summary.status === "healthy" ? "✓" : "!";
-  const history = histories[state.key];
+  const history = histories[state.key] || (summary.status === "healthy"
+    ? histories.healthy
+    : { points: "20,102 100,96 180,91 260,82 340,70 420,58 500,45 580,38 700,31", value: `${summary.failed_checks} finding${summary.failed_checks === 1 ? "" : "s"}`, label: `${scenario.category} evidence`, copy: "Synthetic history is illustrative; the scenario conclusion comes from the structured checks and comparisons." });
   $("#history-line").setAttribute("points", history.points);
   $("#history-value").textContent = history.value;
   $("#history-label").textContent = history.label;
@@ -57,7 +59,7 @@ function render() {
       <td><span class="result result-${result.status}">${result.status}</span></td>
       <td><strong>${escapeHtml(result.name)}</strong><small>${escapeHtml(result.target)}</small></td>
       <td><span class="mono">${escapeHtml(result.check)}</span></td>
-      <td>${result.latency_ms == null ? '<span class="muted">—</span>' : `${result.latency_ms} ms`}</td>
+      <td>${result.rtt_avg_ms != null ? `${result.rtt_avg_ms} ms RTT` : result.command_elapsed_ms == null ? '<span class="muted">—</span>' : `${result.command_elapsed_ms} ms elapsed`}</td>
       <td><span class="checked-time">${state.checkedAt ? escapeHtml(new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" }).format(state.checkedAt)) : "Demo baseline"}</span></td>
       <td>${escapeHtml(result.detail)}</td>
     </tr>`).join("");

@@ -52,7 +52,8 @@ class NetworkTriageTests(unittest.TestCase):
         result = dns_check(Target("App", "missing.contoso.com"), resolver=resolver)
 
         self.assertEqual(result.status, "fail")
-        self.assertIn("DNS lookup failed", result.detail)
+        self.assertIn("System resolver path failed", result.detail)
+        self.assertIn("does not identify", result.limitation)
 
     def test_tcp_check_uses_connector(self) -> None:
         def connector(address: tuple[str, int], timeout: float) -> FakeSocket:
@@ -63,6 +64,7 @@ class NetworkTriageTests(unittest.TestCase):
 
         self.assertEqual(result.status, "pass")
         self.assertEqual(result.check, "tcp/443")
+        self.assertIn("application", result.limitation)
 
     def test_ping_check_uses_runner(self) -> None:
         def runner(command: list[str], timeout: float) -> CommandResult:
@@ -72,6 +74,8 @@ class NetworkTriageTests(unittest.TestCase):
         result = ping_check(Target("Loopback", "localhost"), timeout=1, runner=runner)
 
         self.assertEqual(result.status, "pass")
+        self.assertEqual(result.check, "icmp/echo")
+        self.assertIsNotNone(result.command_elapsed_ms)
 
     def test_run_triage_and_summary(self) -> None:
         def resolver(host: str, port: object) -> list[tuple[object, object, object, object, tuple[str, int]]]:
