@@ -8,6 +8,21 @@ A help desk focused network triage CLI that runs repeatable DNS, ping, TCP port,
 
 This project is built for entry-level IT interviews: it shows practical troubleshooting flow, clean report writing, testable code, and safe defaults.
 
+## Interactive demo
+
+[Launch the Network Triage Lab](https://vxti-glitch.github.io/network-troubleshooting-toolkit/)
+
+The browser demo gives recruiters and hiring managers a quick, installation-free way to review the troubleshooting workflow:
+
+- Choose realistic synthetic incidents covering healthy SaaS access, VPN/DNS failure, blocked HTTPS, and local adapter failure
+- Follow the service path from the endpoint through gateway, DNS, and application port
+- Review the technician assessment and recommended next action
+- Review synthetic latency history, per-run timestamps, endpoint context, and alert acknowledgement state
+- Generate a ticket-ready note plus downloadable Markdown, JSON, and adapter evidence
+- Compare the browser logic with the tested Python implementation in this repository
+
+> **Portfolio disclosure:** The browser scenarios are simulated project work, not paid employment or production network scans. Browsers cannot perform the raw ICMP and TCP checks used by the Python CLI, so the demo uses transparent synthetic results to explain the decision process safely.
+
 ![Sample network triage run](docs/assets/terminal-demo-final.png)
 
 _Sample run against the included target configuration._
@@ -50,6 +65,14 @@ Generated files:
 - `reports/network-triage.md`
 
 See the checked-in [example triage report](docs/examples/network-triage.md) and [example JSON evidence](docs/examples/network-triage.json).
+
+To preview the interactive demo locally:
+
+```powershell
+python -m http.server 8000 --directory docs
+```
+
+Then open `http://127.0.0.1:8000`. The GitHub Pages workflow publishes the `docs` directory after Pages is configured to use GitHub Actions.
 
 ## Sample target config
 

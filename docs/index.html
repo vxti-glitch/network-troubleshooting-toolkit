@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive network triage portfolio lab by vxti-glitch: separate DNS, ping, TCP, and local adapter evidence before escalation.">
+    <meta name="theme-color" content="#07141f">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Network Triage Lab · vxti-glitch">
+    <meta property="og:description" content="Isolate the failing layer. Document the evidence.">
+    <meta property="og:url" content="https://vxti-glitch.github.io/network-troubleshooting-toolkit/">
+    <meta property="og:image" content="https://vxti-glitch.github.io/network-troubleshooting-toolkit/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Network Triage Lab · vxti-glitch">
+    <meta name="twitter:description" content="Isolate the failing layer. Document the evidence.">
+    <meta name="twitter:image" content="https://vxti-glitch.github.io/network-troubleshooting-toolkit/og.png">
+    <title>Network Triage Lab · vxti-glitch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css?v=20260829-monitoring-context">
+    <script type="module" src="./app.mjs?v=20260829-monitoring-context"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#lab">Skip to network lab</a>
+    <header class="topbar">
+      <a class="brand" href="#lab"><span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>NET<span>TRIAGE</span></strong><small>SUPPORT DIAGNOSTICS LAB</small></span></a>
+      <nav aria-label="Main navigation">
+        <a href="#lab">Live lab</a>
+        <a href="#method">Method</a>
+        <a href="https://github.com/vxti-glitch/network-troubleshooting-toolkit">Source code <span aria-hidden="true">↗</span></a>
+      </nav>
+      <div class="simulation-badge"><span></span> Synthetic evidence</div>
+    </header>
+
+    <main id="lab" class="lab-shell">
+      <section class="lab-intro">
+        <div><span class="eyebrow">Interactive portfolio lab · vxti-glitch</span><h1>Isolate the failing layer. <em>Document the evidence.</em></h1></div>
+        <p>Select a support ticket, run the diagnostic sequence, and prepare an escalation-ready handoff. This browser experience simulates the same decision logic as the repository's tested Python CLI.</p>
+      </section>
+
+      <section class="control-panel" aria-label="Network triage controls">
+        <div class="scenario-field">
+          <label for="scenario">Support ticket</label>
+          <select id="scenario">
+            <option value="healthy">Microsoft 365 sign-in restored</option>
+            <option value="dns">VPN name resolution failure</option>
+            <option value="blocked">HTTPS path blocked</option>
+            <option value="local">Local adapter lost its address</option>
+          </select>
+          <p id="scenario-impact">One remote user reported that Microsoft 365 sign-in was unavailable.</p>
+        </div>
+        <div class="run-group">
+          <div><span class="run-label">Diagnostic sequence</span><strong>Adapter → Gateway → DNS → Service</strong></div>
+          <button id="run-triage" type="button"><span class="play" aria-hidden="true">▶</span> Run network triage</button>
+        </div>
+        <p id="live-status" class="live-status" role="status" aria-live="polite">Demo loaded with synthetic evidence. Choose a ticket and run triage.</p>
+      </section>
+
+      <section class="ops-strip" aria-label="Monitoring context">
+        <div><span>Site</span><strong>Remote Support Lab</strong></div>
+        <div><span>Endpoint</span><strong id="ops-endpoint">WIN11-REMOTE-07</strong></div>
+        <div><span>Observation window</span><strong>Last 30 minutes</strong></div>
+        <div><span>Last checked</span><strong id="last-checked">Waiting for triage</strong></div>
+        <button id="ack-alert" type="button" disabled>No active alert</button>
+      </section>
+
+      <section class="metrics" aria-label="Network triage summary">
+        <article><span>Overall status</span><strong id="metric-status" class="metric-status">HEALTHY</strong><small id="metric-scope">Single-user scope</small></article>
+        <article><span>Targets checked</span><strong id="metric-targets">2</strong><small>configured endpoints</small></article>
+        <article><span>Checks completed</span><strong id="metric-checks">3</strong><small>DNS · ICMP · TCP</small></article>
+        <article><span>Failed checks</span><strong id="metric-failed">0</strong><small>evidence requiring review</small></article>
+      </section>
+
+      <section class="diagnostic-grid">
+        <article class="panel history-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Recent signal</span><h2>Latency &amp; availability history</h2></div><span class="panel-tag" id="history-label">Healthy path</span></div>
+          <div class="history-body">
+            <svg viewBox="0 0 720 150" role="img" aria-label="Synthetic 30-minute latency history"><line x1="20" y1="125" x2="700" y2="125"></line><line x1="20" y1="75" x2="700" y2="75"></line><line x1="20" y1="25" x2="700" y2="25"></line><polyline id="history-line" points="20,108 100,102 180,106 260,96 340,100 420,92 500,99 580,95 700,90"></polyline></svg>
+            <div class="history-summary"><strong id="history-value">41.7 ms</strong><span id="history-copy">Application-path response remains inside the fictional baseline.</span></div>
+          </div>
+        </article>
+
+        <article class="panel path-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Layer isolation</span><h2>Service path</h2></div><span class="panel-tag">OSI-informed workflow</span></div>
+          <div class="network-path" id="network-path">
+            <div class="path-node" data-node="device"><span class="node-icon">01</span><div><small>Endpoint</small><strong>User device</strong></div><b>PASS</b></div>
+            <span class="connector"></span>
+            <div class="path-node" data-node="gateway"><span class="node-icon">02</span><div><small>Local path</small><strong>Gateway</strong></div><b>PASS</b></div>
+            <span class="connector"></span>
+            <div class="path-node" data-node="dns"><span class="node-icon">03</span><div><small>Name service</small><strong>DNS</strong></div><b>PASS</b></div>
+            <span class="connector"></span>
+            <div class="path-node" data-node="service"><span class="node-icon">04</span><div><small>Application</small><strong>TCP service</strong></div><b>PASS</b></div>
+          </div>
+        </article>
+
+        <article class="panel assessment-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Technician reasoning</span><h2>Assessment</h2></div></div>
+          <div class="assessment-state" id="assessment-state"><span class="assessment-icon" aria-hidden="true">✓</span><div><strong>Service path is healthy</strong><p id="assessment-text">DNS and TCP 443 both succeed. Validate browser state and the user's sign-in session.</p></div></div>
+          <div class="next-action"><span>Recommended next action</span><p id="next-action">Clear the stale browser session, retry in a private window, and confirm the user can sign in before closing the ticket.</p></div>
+        </article>
+
+        <article class="panel evidence-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Collected evidence</span><h2>Check results</h2></div><span class="panel-hint">Select a result for context</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Status</th><th>Target</th><th>Check</th><th>Latency</th><th>Checked</th><th>Evidence</th></tr></thead>
+              <tbody id="evidence-rows"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel ticket-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Ticket documentation</span><h2>Escalation-ready note</h2></div><button class="small-button" id="copy-ticket" type="button">Copy ticket note</button></div>
+          <pre id="ticket-note" tabindex="0" aria-label="Generated ticket note"></pre>
+          <p class="panel-footnote">The note separates user impact, scope, evidence, assessment, next action, and escalation ownership.</p>
+        </article>
+
+        <article class="panel export-panel">
+          <div class="panel-heading"><div><span class="eyebrow">Portable evidence</span><h2>Generated report</h2></div><button class="small-button" id="download-report" type="button">Download Markdown</button></div>
+          <div class="output-tabs" role="tablist" aria-label="Report format">
+            <button class="is-active" type="button" role="tab" aria-selected="true" data-output="markdown">Markdown</button>
+            <button type="button" role="tab" aria-selected="false" data-output="json">JSON</button>
+            <button type="button" role="tab" aria-selected="false" data-output="adapter">Adapter evidence</button>
+          </div>
+          <pre id="report-output" tabindex="0" aria-label="Generated report preview"></pre>
+        </article>
+      </section>
+
+      <section id="method" class="method-strip">
+        <div><span class="eyebrow">Why this matters</span><strong>Ping alone is not a service test.</strong></div>
+        <p>Many cloud services block ICMP while HTTPS remains available. The toolkit treats successful DNS plus TCP 443 as stronger application-path evidence and documents the distinction for escalation.</p>
+        <span class="method-chip">DNS ≠ ICMP ≠ TCP</span>
+      </section>
+
+      <section class="reviewer-tour">
+        <div class="tour-heading"><span class="eyebrow">90-second reviewer tour</span><h2>What this demonstration proves</h2><p>A recruiter can understand the workflow without installing Python. An interviewer can open the repository to verify the matching implementation and tests.</p></div>
+        <ol>
+          <li><span>01</span><div><strong>Scope the incident</strong><p>Distinguish one user from shared-service impact before choosing the escalation path.</p></div></li>
+          <li><span>02</span><div><strong>Test independent layers</strong><p>Collect adapter, gateway, DNS, ICMP, and application-port evidence instead of guessing.</p></div></li>
+          <li><span>03</span><div><strong>Explain the conclusion</strong><p>Turn technical results into a plain-language assessment and a safe next action.</p></div></li>
+          <li><span>04</span><div><strong>Leave usable evidence</strong><p>Generate a ticket note plus Markdown and JSON reports for the next support tier.</p></div></li>
+        </ol>
+        <div class="portfolio-disclosure"><strong>Portfolio disclosure</strong><p>This is a simulated browser demonstration of hands-on project work, not paid employment or a production network scan. All hosts, addresses, users, and outcomes shown in the scenarios are fictional or documentation-safe examples.</p><a href="https://github.com/vxti-glitch/network-troubleshooting-toolkit">Inspect the Python implementation and tests <span aria-hidden="true">↗</span></a></div>
+      </section>
+    </main>
+
+    <footer><p><strong>Simulated portfolio project.</strong> No production network scanning, customer data, or paid-work claim.</p><a href="https://github.com/vxti-glitch">github.com/vxti-glitch <span aria-hidden="true">↗</span></a></footer>
+  </body>
+</html>

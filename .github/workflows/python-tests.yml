@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -19,3 +19,6 @@ jobs:
 
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+
+      - name: Test interactive demo logic
+        run: node --test tests/demo-triage.test.mjs
