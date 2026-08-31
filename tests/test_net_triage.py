@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import socket
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,6 +11,7 @@ from src.net_triage import (
     CommandResult,
     Target,
     build_payload,
+    collect_local_info,
     dns_check,
     load_targets,
     ping_check,
@@ -97,6 +99,61 @@ class NetworkTriageTests(unittest.TestCase):
 
         self.assertEqual(summarize_status(results), "healthy")
         self.assertEqual(payload["summary"]["failed_checks"], 0)
+
+    def test_command_timeout_is_reported_without_crashing(self) -> None:
+        def runner(command: list[str], timeout: float) -> CommandResult:
+            raise subprocess.TimeoutExpired(command, timeout)
+
+        ping = ping_check(Target("Slow", "192.0.2.1"), timeout=0.1, runner=runner)
+        local = collect_local_info(timeout=0.1, runner=runner)
+
+        self.assertEqual(ping.status, "fail")
+        self.assertIn("failed", ping.detail.lower())
+        self.assertEqual(local["status"], "fail")
+
+    def test_partial_local_output_keeps_known_and_missing_fields_explicit(self) -> None:
+        def runner(command: list[str], timeout: float) -> CommandResult:
+            return CommandResult(1, "IPv4 Address: 192.0.2.25", "Access denied to remaining adapter fields")
+
+        local = collect_local_info(timeout=1, runner=runner)
+
+        self.assertEqual(local["status"], "fail")
+        self.assertEqual(local["facts"]["ipv4_addresses"], ["192.0.2.25"])
+        self.assertEqual(local["facts"]["default_gateways"], [])
+        self.assertEqual(local["facts"]["dns_servers"], [])
+
+    def test_dns_failure_can_coexist_with_tcp_success_by_ip(self) -> None:
+        def resolver(host: str, port: object) -> list[object]:
+            raise socket.gaierror("no answer")
+
+        def connector(address: tuple[str, int], timeout: float) -> FakeSocket:
+            self.assertEqual(address, ("192.0.2.44", 443))
+            return FakeSocket()
+
+        results = [
+            dns_check(Target("Named app", "app.example.test"), resolver=resolver),
+            tcp_check(Target("App by IP", "192.0.2.44"), 443, timeout=1, connector=connector),
+        ]
+
+        self.assertEqual([item.status for item in results], ["fail", "pass"])
+        self.assertEqual(summarize_status(results), "degraded")
+
+    def test_icmp_blocked_with_tcp_success_is_degraded_not_down(self) -> None:
+        def runner(command: list[str], timeout: float) -> CommandResult:
+            return CommandResult(1, "Request timed out.\n100% packet loss", "")
+
+        def connector(address: tuple[str, int], timeout: float) -> FakeSocket:
+            return FakeSocket()
+
+        target = Target("HTTPS", "192.0.2.80")
+        results = [
+            ping_check(target, timeout=1, runner=runner),
+            tcp_check(target, 443, timeout=1, connector=connector),
+        ]
+
+        self.assertEqual(results[0].status, "fail")
+        self.assertEqual(results[1].status, "pass")
+        self.assertEqual(summarize_status(results), "degraded")
 
 
 if __name__ == "__main__":
