@@ -6,13 +6,13 @@
 
 A help desk focused network triage CLI that records the system DNS path, ICMP evidence, TCP port reachability, and local network state, then writes escalation-ready Markdown and JSON reports without overstating what any single check proves.
 
-This project is built for entry-level IT interviews: it shows practical troubleshooting flow, clean report writing, testable code, and safe defaults.
+I built this portfolio project to show a practical troubleshooting flow, clear report writing, testable code, and safe defaults.
 
 ## Interactive demo
 
 [Launch the Network Triage Lab](https://vxti-glitch.github.io/network-troubleshooting-toolkit/)
 
-The browser demo gives recruiters and hiring managers a quick, installation-free way to review the troubleshooting workflow:
+The browser demo provides an installation-free way to review the troubleshooting workflow:
 
 - Choose twelve realistic synthetic incidents covering healthy SaaS access, VPN/DNS and route failures, blocked ports, APIPA/DHCP, wrong gateway, loss/latency, Wi-Fi roaming, duplicate IP symptoms, adapter faults, and proxy/captive-portal behavior
 - Follow the service path from the endpoint through gateway, DNS, and application port
@@ -21,7 +21,7 @@ The browser demo gives recruiters and hiring managers a quick, installation-free
 - Generate a ticket-ready note plus downloadable Markdown, JSON, and adapter evidence
 - Compare the browser logic with the tested Python implementation in this repository
 
-> **Portfolio disclosure:** The browser scenarios are simulated project work, not paid employment or production network scans. Browsers cannot perform the raw ICMP and TCP checks used by the Python CLI, so the demo uses transparent synthetic results to explain the decision process safely.
+> **Portfolio disclosure:** The browser scenarios are a simulation, not real network tests, paid employment, or production network scans. Browsers cannot perform the raw ICMP and TCP checks used by the Python CLI, so the demo uses transparent synthetic results to explain the decision process safely.
 
 ![Sample network triage run](docs/assets/terminal-demo-final.png)
 
@@ -67,6 +67,8 @@ Generated files:
 
 See the checked-in [example triage report](docs/examples/network-triage.md) and [example JSON evidence](docs/examples/network-triage.json).
 
+Read [How I built and verified this](docs/HOW_I_BUILT_AND_VERIFIED_THIS.md) for the parser and measurement boundaries. [`evidence/README.md`](evidence/README.md) defines the evidence required before claiming a controlled DNS-failure lab; no such result is currently committed.
+
 To preview the interactive demo locally:
 
 ```powershell
@@ -101,3 +103,5 @@ Then open `http://127.0.0.1:8000`. The GitHub Pages workflow publishes the `docs
 ## Notes
 
 Some services block ICMP ping while still serving HTTPS correctly. For cloud services, TCP 443 is usually a better availability signal than ping.
+
+Before sharing a report, remove or replace usernames, hostnames, internal domains, SSIDs/BSSIDs, public IP addresses, VPN identifiers, unrelated adapter details, and other identifying data. The checked-in examples use synthetic or documentation-safe values.
